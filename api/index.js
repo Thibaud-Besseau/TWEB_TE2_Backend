@@ -4,8 +4,24 @@ const passport = require('passport');
 const { port } = require('./config');
 const api = require('./routes/api');
 const auth = require('./routes/auth');
+var mongoose = require('mongoose');
 
 const app = express();
+const { mongoURI: db } = process.env;
+
+
+
+// Connect to MongoDB with Mongoose.
+mongoose
+    .connect(
+        db,
+        {
+          useCreateIndex: true,
+          useNewUrlParser: true
+        }
+    )
+    .then(() => console.log("MongoDB connected"))
+    .catch(err => console.log(err));
 
 app.use(express.json());
 app.use(passport.initialize());

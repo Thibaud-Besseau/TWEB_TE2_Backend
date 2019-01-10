@@ -4,6 +4,9 @@ const passportLocal = require('passport-local');
 const passportJWT = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 const { jwtOptions } = require('../config');
+import User from "../models/User";
+const bcrypt = require('bcrypt');
+
 
 const USER = {
   id: '123456789',
@@ -22,13 +25,20 @@ passport.use(new LocalStrategy(
     usernameField: 'username',
     passwordField: 'password',
   },
-  (username, password, done) => {
+  async (username, password, done) => {
     // here you should make a database call
-    if (username === USER.username && password === USER.password) {
-      return done(null, USER);
-    }
-    return done(null, false);
-  },
+
+    let userToTest= await User.findOne({ username }).exec().then();
+
+    if(bcrypt.compareSync(password, userToTest.password)) {
+
+      var userData = [];
+      userData.push({_id: userToTest._id, username: userToTest.username});
+
+      return done(null, userData);
+    } else {
+      return done(null, false);
+    }}
 ));
 
 passport.use(new JWTStrategy(
@@ -36,17 +46,21 @@ passport.use(new JWTStrategy(
     secretOrKey: jwtOptions.secret,
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   },
-  (jwtPayload, done) => {
+  async (jwtPayload, done) => {
     const { userId } = jwtPayload;
-    if (userId !== USER.id) {
+
+    let userToTest= await User.findOne({ userId }).exec().then();
+
+    if (userToTest === undefined) {
       return done(null, false);
     }
-    return done(null, USER);
+    return done(null, userToTest);
   },
 ));
 
 router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
   const { password, ...user } = req.user;
+  console.log(password);
   const token = jwt.sign({ userId: user.id }, jwtOptions.secret);
   res.send({ user, token });
 });

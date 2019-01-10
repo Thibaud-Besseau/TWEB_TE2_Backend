@@ -1,5 +1,11 @@
+require("dotenv").config();
 const express = require('express');
 const passport = require('passport');
+import User from "../models/Movie";
+
+let moviesController = require('../controllers/moviesController');
+let registerController = require('../controllers/registerController');
+
 
 const router = express.Router();
 
@@ -24,20 +30,8 @@ const authentication = (req, res, next) => {
   })(req, res, next);
 }
 
-// This endpoint is accessible by authenticated and anonymous users
-router.get('/public', authentication, (req, res) => {
-  const username = req.user ? req.user.username : 'anonymous';
-  res.send({ message: `Hello ${username}, this message is public!` })
-})
 
-// This endpoint is protected and has access to the authenticated user.
-router.get('/private', authenticationRequired, (req, res) => {
-  res.send({ message: `Hello ${req.user.username}, only logged in users can see this message!` })
-})
-
-// This endpoint is protected and has access to the authenticated user.
-router.get('/me', authenticationRequired, (req, res) => {
-  res.send({ user: req.user });
-})
+router.route('/movies').get(moviesController.index);
+router.route('/register').post(registerController.new);
 
 module.exports = router;
