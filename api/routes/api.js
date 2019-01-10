@@ -33,5 +33,7 @@ const authentication = (req, res, next) => {
 
 router.route('/movies').get(moviesController.index);
 router.route('/register').post(registerController.new);
+router.route('/editWatchList').post(registerController.new);
+
 
 module.exports = router;
