@@ -29,3 +29,4 @@ https://young-hamlet-95202.herokuapp.com/
 2019-01-10T14:35:03.863791+00:00 app[web.1]: npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
 
 ```
+ db proof sended to paul with telegram 
